@@ -7,9 +7,13 @@
   "background": {
     "service_worker": "background.js"
   },
+  "icons": {
+    "48": "logo.png"
+  },
   "action": {
     "default_title": "AI Chat Scroll",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "logo.png"
   },
   "content_scripts": [
     {
