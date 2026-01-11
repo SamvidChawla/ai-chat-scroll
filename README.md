@@ -1,4 +1,5 @@
-# AI Chat Scroll (v0.3)
+# AI Chat Scroll (v0.3) 
+![Logo](logo.png)
 
 AI Chat Scroll is a browser extension that allows users to bookmark specific DOM elements on any webpage and later scroll back to them.
 Bookmarks are stored locally and scoped per page.
@@ -116,3 +117,13 @@ This extension is provided on an **“as is”** basis, without warranties or gu
 It is shared as a **portfolio and demonstration project** to showcase browser extension development concepts. The author makes no claims regarding suitability for production environments and assumes no responsibility for issues arising from its use.
 
 Use at your own discretion.
+
+---
+
+## License
+
+![Logo](logo.png)
+
+**Logo:** © 2026 Samvid. All rights reserved. 
+
+**Code:** MIT License
