@@ -13,6 +13,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
   chrome.tabs.sendMessage(tab.id, { action: "bookmark-element" })
     .catch(err => {
-      console.warn("Could not send message to content script:", err);
+      console.warn("Could not send message to content script (page might be loading):", err);
     });
 });
