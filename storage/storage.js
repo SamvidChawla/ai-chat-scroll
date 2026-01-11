@@ -1,23 +1,23 @@
-function saveBookmark(id, url) {
+function saveBookmark(id, key, text) {
   chrome.storage.local.get({ bookmarks: {} }, (data) => {
     const bookmarks = data.bookmarks;
-    if (!bookmarks[url]) bookmarks[url] = [];
-    if (!bookmarks[url].includes(id)) bookmarks[url].push(id);
+    if (!bookmarks[key]) bookmarks[key] = [];
+    if (!bookmarks[key].some(b => b.id === id)) bookmarks[key].push({ id, text });
     chrome.storage.local.set({ bookmarks });
   });
 }
 
-function loadBookmarks(url, callback) {
+function loadBookmarks(key, callback) {
   chrome.storage.local.get({ bookmarks: {} }, (data) => {
-    callback(data.bookmarks[url] || []);
+    callback(data.bookmarks[key] || []);
   });
 }
 
-function deleteBookmark(id, url) {
+function deleteBookmark(id, key) {
   chrome.storage.local.get({ bookmarks: {} }, (data) => {
     const bookmarks = data.bookmarks;
-    if (bookmarks[url]) {
-      bookmarks[url] = bookmarks[url].filter(b => b !== id);
+    if (bookmarks[key]) {
+      bookmarks[key] = bookmarks[key].filter(b => b.id !== id);
       chrome.storage.local.set({ bookmarks });
     }
   });

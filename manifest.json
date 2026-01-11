@@ -2,16 +2,20 @@
   "manifest_version": 3,
   "name": "AI Chat Scroll",
   "version": "0.1",
-  "description": "Bookmark messages dynamically on any website",
-  "permissions": ["storage"],
+  "description": "Bookmark and scroll to elements on any site",
+  "permissions": ["storage", "contextMenus", "activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "AI Chat Scroll",
+    "default_popup": "popup.html"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["content/observer.js"],
-      "run_at": "document_end"
+      "run_at": "document_idle"
     }
-  ],
-  "action": {
-    "default_title": "AI Chat Scroll"
-  }
+  ]
 }
