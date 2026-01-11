@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Chat Scroll",
-  "version": "0.2",
+  "version": "0.3",
   "description": "Bookmark and scroll to specific elements on any page.",
   "permissions": ["storage", "contextMenus", "activeTab"],
   "background": {
@@ -15,7 +15,8 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content/observer.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ]
 }

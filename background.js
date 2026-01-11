@@ -1,4 +1,3 @@
-// Create context menu on install
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "bookmark-element",
@@ -7,12 +6,16 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-// Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (!tab?.id) return;
 
-  chrome.tabs.sendMessage(tab.id, { action: "bookmark-element" })
+  // Send to the specific frame where the click happened (vital for iframes)
+  // If frameId is missing, default to 0 (main frame)
+  const targetFrame = info.frameId || 0;
+
+  chrome.tabs.sendMessage(tab.id, { action: "bookmark-element" }, { frameId: targetFrame })
     .catch(err => {
-      console.warn("Could not send message to content script (page might be loading):", err);
+      // Swallow error if content script isn't ready
+      console.warn("Msg failed:", err);
     });
 });

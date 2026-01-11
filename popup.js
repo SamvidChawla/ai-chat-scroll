@@ -1,60 +1,51 @@
 const listEl = document.getElementById("bookmark-list");
 
+// 1. Identify Context
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const currentTab = tabs[0];
   
-  if (!currentTab || !currentTab.url) {
-    listEl.innerHTML = "<li>Cannot access this page (restricted URL).</li>";
+  // Guard: Restricted pages (chrome://)
+  if (!currentTab?.url) {
+    listEl.innerHTML = "<li style='text-align:center;color:#666'>Cannot use on this page</li>";
     return;
   }
 
-  // key normalization: match the logic used in content/observer.js
   const urlObj = new URL(currentTab.url);
   const key = urlObj.origin + urlObj.pathname;
 
-  // Fetch bookmarks specific to this page context
+  // 2. Load
   loadBookmarks(key, (bookmarks) => {
     if (!bookmarks || !bookmarks.length) {
-      listEl.innerHTML = "<li>No bookmarks for this page.</li>";
+      listEl.innerHTML = "<li style='text-align:center;color:#666'>No bookmarks yet.</li>";
       return;
     }
 
+    // 3. Render
     bookmarks.forEach(b => {
       const li = document.createElement("li");
       
+      // Label
       const span = document.createElement("span");
       span.textContent = b.text;
-      span.title = "Jump to: " + b.text; // Tooltip for better UX
+      span.title = b.fullText; // Tooltip
       
       span.addEventListener("click", () => {
-        // Send navigation request to the Content Script
-        // We pass both selector (primary) and fullText (fallback)
+        // Send scroll request to all frames in tab (browser handles routing usually)
         chrome.tabs.sendMessage(currentTab.id, { 
           action: "scroll-to-element", 
           selector: b.selector,
           fullText: b.fullText 
         }, (response) => {
           
-          // ERROR HANDLING: Connection Issues
           if (chrome.runtime.lastError) {
-             console.error("Connection failed:", chrome.runtime.lastError.message);
-             alert("Connection lost. Please refresh the web page and try again.");
+             console.error("Link error:", chrome.runtime.lastError.message);
              return;
           }
 
-          // ERROR HANDLING: Element Missing
-          // Content script couldn't find the node via selector OR text search.
-          if (response && response.status === "missing") {
-            const confirmDel = confirm(
-              "Target not found.\n\nThe content may have been deleted or the page structure changed significantly.\n\nClean up this bookmark?"
-            );
-            
-            if (confirmDel) {
+          if (response?.status === "missing") {
+            if (confirm("Element not found (page changed?). Delete bookmark?")) {
               deleteBookmark(b.id, key);
               li.remove();
-              if (listEl.children.length === 0) {
-                 listEl.innerHTML = "<li>No bookmarks for this page.</li>";
-              }
             }
           }
         });
@@ -63,20 +54,14 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       li.appendChild(span);
 
       const delBtn = document.createElement("button");
-      delBtn.innerHTML = "&times;"; // HTML Entity for 'multiplication sign' (cleaner X)
+      delBtn.innerHTML = "&times;";
       delBtn.className = "del-btn";
-      delBtn.title = "Delete bookmark";
-      
+      delBtn.title = "Remove";
       delBtn.addEventListener("click", (e) => {
-        e.stopPropagation(); // Critical: prevent bubbling to the <span> click handler (scroll)
-        
+        e.stopPropagation();
         deleteBookmark(b.id, key);
         li.remove();
-        
-        // Re-check empty state after deletion
-        if (listEl.children.length === 0) {
-            listEl.innerHTML = "<li>No bookmarks for this page.</li>";
-        }
+        if (listEl.children.length === 0) listEl.innerHTML = "<li style='text-align:center;color:#666'>No bookmarks yet.</li>";
       });
 
       li.appendChild(delBtn);
